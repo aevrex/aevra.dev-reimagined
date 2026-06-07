@@ -1,0 +1,10 @@
+# Ignore local build artifacts and editor files
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+*.log
+*.tmp
+*.swp
+**/node_modules
+**/vendor
