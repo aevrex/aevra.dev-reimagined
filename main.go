@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"html/template"
 	"net/http"
 	"strings"
@@ -118,11 +119,25 @@ var items = []Item{
 	},
 }
 
-var templates = template.Must(template.ParseGlob("templates/*.html"))
+func loadTemplates() *template.Template {
+	t := template.New("")
+	var renderFn func(name string, data any) template.HTML
+	renderFn = func(name string, data any) template.HTML {
+		var buf bytes.Buffer
+		if err := t.ExecuteTemplate(&buf, name, data); err != nil {
+			return template.HTML("<!-- template render error: " + err.Error() + " -->")
+		}
+		return template.HTML(buf.String())
+	}
 
-func init() {
-	template.Must(templates.ParseGlob("templates/partials/*.html"))
+	t = template.Must(t.Funcs(template.FuncMap{
+		"render": renderFn,
+	}).ParseGlob("templates/*.html"))
+	template.Must(t.ParseGlob("templates/partials/*.html"))
+	return t
 }
+
+var templates = loadTemplates()
 
 func render(w http.ResponseWriter, name string, data PageData) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
