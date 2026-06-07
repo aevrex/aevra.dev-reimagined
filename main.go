@@ -176,6 +176,6 @@ func main() {
 	http.HandleFunc("/blog/{slug}", postPage)
 	http.HandleFunc("/store", store)
 	http.HandleFunc("/store/{slug}", itemPage)
-
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	
+	http.ListenAndServe(":8080", nil)
 }
