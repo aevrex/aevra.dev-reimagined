@@ -1,0 +1,24 @@
+<section class="mx-auto max-w-5xl px-5 py-14 sm:px-8 sm:py-20">
+	<button hx-get="/store" hx-target="#content" class="text-sm font-bold text-stone-500 hover:text-stone-900">&larr; Store</button>
+
+	<div class="mt-10 grid gap-10 lg:grid-cols-[1fr_22rem] lg:items-start">
+		<div>
+			<p class="text-sm font-bold uppercase tracking-[0.18em] text-amber-700">{{.Price}}</p>
+			<h1 class="mt-4 text-4xl font-bold tracking-tight sm:text-6xl">{{.Name}}</h1>
+			<p class="mt-6 max-w-2xl text-xl leading-8 text-stone-600">{{.Description}}</p>
+			<p class="mt-8 max-w-2xl leading-7 text-stone-600">
+				This is a clear starting point, not a maze of upgrades. The final scope is agreed before work begins, and you keep ownership of the result.
+			</p>
+		</div>
+
+		<aside class="rounded-3xl bg-stone-900 p-7 text-white">
+			<h2 class="text-xl font-bold">What is included</h2>
+			<ul class="mt-6 space-y-4 text-sm text-stone-300">
+				{{range .Includes}}<li class="flex gap-3"><span class="font-bold text-amber-400">+</span> {{.}}</li>{{end}}
+			</ul>
+			<p class="mt-8 border-t border-stone-700 pt-6 text-sm leading-6 text-stone-400">
+				Contact and checkout can be added later when you are ready. For now this stays a clean, static package page.
+			</p>
+		</aside>
+	</div>
+</section>
