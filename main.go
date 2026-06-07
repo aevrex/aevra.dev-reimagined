@@ -177,11 +177,5 @@ func main() {
 	http.HandleFunc("/store", store)
 	http.HandleFunc("/store/{slug}", itemPage)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8091"
-	}
-
-	log.Printf("Aevra is running at http://localhost:%s", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
