@@ -5,41 +5,35 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="Aevra builds clear, useful websites and digital systems for small businesses.">
 	<title>Aevra</title>
-	<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="min-h-screen bg-stone-50 text-stone-900">
 	<header class="border-b border-stone-200 bg-white">
 		<div class="mx-auto flex max-w-6xl items-center justify-between px-5 py-5 sm:px-8">
-			<button
-				hx-get="/home"
-				hx-target="#content"
-				class="flex items-center gap-3 text-left"
-				aria-label="Aevra home"
-			>
+			<a href="/" class="flex items-center gap-3 text-left" aria-label="Aevra home">
 				<span class="grid h-10 w-10 place-items-center rounded-xl bg-stone-900 text-lg font-bold text-white">A</span>
 				<span>
 					<span class="block text-lg font-bold tracking-tight">Aevra</span>
 					<span class="block text-xs text-stone-500">Web studio</span>
 				</span>
-			</button>
+			</a>
 
 			<nav class="flex items-center gap-1 sm:gap-2" aria-label="Main navigation">
-				<button hx-get="/home" hx-target="#content" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-stone-100">Home</button>
-				<button hx-get="/blog" hx-target="#content" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-stone-100">Blog</button>
-				<button hx-get="/store" hx-target="#content" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-stone-100">Store</button>
+				<a href="/" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-stone-100">Home</a>
+				<a href="/blog" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-stone-100">Blog</a>
+				<a href="/store" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-stone-100">Store</a>
 			</nav>
 		</div>
 	</header>
 
 	<main id="content" class="min-h-[calc(100vh-11rem)]">
-		{{template "home.html" .}}
+		{{template .Content .}}
 	</main>
 
 	<footer class="border-t border-stone-200 bg-white">
 		<div class="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-8 text-sm text-stone-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
 			<p>Aevra / Clear websites for small businesses.</p>
-			<p>Built with Go, HTMX, and Tailwind.</p>
+			<p>Built with Go, HTML, and Tailwind.</p>
 		</div>
 	</footer>
 </body>

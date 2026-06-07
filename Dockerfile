@@ -1,21 +1,11 @@
-# Build stage
-FROM golang:1.24-alpine AS builder
+FROM golang:1.26-alpine
 
 WORKDIR /app
 
-COPY go.mod .
 COPY . .
 
-RUN go build -o /aevra .
+RUN go build -o main .
 
-# Runtime stage
-FROM gcr.io/distroless/static:nonroot
+EXPOSE 8080
 
-WORKDIR /app
-COPY --from=builder /aevra /aevra
-COPY --from=builder /app/templates /app/templates
-
-EXPOSE 8091
-
-USER nonroot:nonroot
-ENTRYPOINT ["/aevra"]
+CMD ["./main"]

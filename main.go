@@ -2,9 +2,8 @@ package main
 
 import (
 	"html/template"
-	"log"
 	"net/http"
-	"os"
+	"strings"
 )
 
 type Post struct {
@@ -24,9 +23,12 @@ type Item struct {
 	Includes    []string
 }
 
-type HomeData struct {
-	Posts []Post
-	Items []Item
+type PageData struct {
+	Content string
+	Posts   []Post
+	Items   []Item
+	Post    Post
+	Item    Item
 }
 
 var posts = []Post{
@@ -122,60 +124,123 @@ func init() {
 	template.Must(templates.ParseGlob("templates/partials/*.html"))
 }
 
-func render(w http.ResponseWriter, name string, data any) {
+func render(w http.ResponseWriter, name string, data PageData) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := templates.ExecuteTemplate(w, name, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
+func isHTMX(r *http.Request) bool {
+	return r.Header.Get("HX-Request") == "true"
+}
+
 func home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
+	if r.URL.Path != "/" && r.URL.Path != "/home" {
 		http.NotFound(w, r)
 		return
 	}
-	render(w, "layout.html", HomeData{Posts: posts[:3], Items: items})
-}
 
-func homePartial(w http.ResponseWriter, r *http.Request) {
-	render(w, "home.html", HomeData{Posts: posts[:3], Items: items})
+	if isHTMX(r) {
+		render(w, "home.html", PageData{Posts: posts[:3], Items: items})
+		return
+	}
+
+	if r.URL.Path == "/home" {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	render(w, "layout.html", PageData{Content: "home.html", Posts: posts[:3], Items: items})
 }
 
 func blog(w http.ResponseWriter, r *http.Request) {
-	render(w, "blog.html", posts)
+	if r.URL.Path != "/blog" {
+		http.NotFound(w, r)
+		return
+	}
+
+	if isHTMX(r) {
+		render(w, "blog.html", PageData{Posts: posts})
+		return
+	}
+
+	render(w, "layout.html", PageData{Content: "blog.html", Posts: posts})
 }
 
 func postPage(w http.ResponseWriter, r *http.Request) {
+	if !strings.HasPrefix(r.URL.Path, "/blog/") {
+		http.NotFound(w, r)
+		return
+	}
+
+	slug := strings.TrimPrefix(r.URL.Path, "/blog/")
+	if slug == "" || strings.Contains(slug, "/") {
+		http.NotFound(w, r)
+		return
+	}
+
 	for _, post := range posts {
-		if post.Slug == r.PathValue("slug") {
-			render(w, "post.html", post)
+		if post.Slug == slug {
+			if isHTMX(r) {
+				render(w, "post.html", PageData{Post: post})
+				return
+			}
+			render(w, "layout.html", PageData{Content: "post.html", Post: post})
 			return
 		}
 	}
+
 	http.NotFound(w, r)
 }
 
 func store(w http.ResponseWriter, r *http.Request) {
-	render(w, "store.html", items)
+	if r.URL.Path != "/store" {
+		http.NotFound(w, r)
+		return
+	}
+
+	if isHTMX(r) {
+		render(w, "store.html", PageData{Items: items})
+		return
+	}
+
+	render(w, "layout.html", PageData{Content: "store.html", Items: items})
 }
 
 func itemPage(w http.ResponseWriter, r *http.Request) {
+	if !strings.HasPrefix(r.URL.Path, "/store/") {
+		http.NotFound(w, r)
+		return
+	}
+
+	slug := strings.TrimPrefix(r.URL.Path, "/store/")
+	if slug == "" || strings.Contains(slug, "/") {
+		http.NotFound(w, r)
+		return
+	}
+
 	for _, item := range items {
-		if item.Slug == r.PathValue("slug") {
-			render(w, "item.html", item)
+		if item.Slug == slug {
+			if isHTMX(r) {
+				render(w, "item.html", PageData{Item: item})
+				return
+			}
+			render(w, "layout.html", PageData{Content: "item.html", Item: item})
 			return
 		}
 	}
+
 	http.NotFound(w, r)
 }
 
 func main() {
+	http.HandleFunc("/home", home)
 	http.HandleFunc("/", home)
-	http.HandleFunc("/home", homePartial)
 	http.HandleFunc("/blog", blog)
-	http.HandleFunc("/blog/{slug}", postPage)
+	http.HandleFunc("/blog/", postPage)
 	http.HandleFunc("/store", store)
-	http.HandleFunc("/store/{slug}", itemPage)
-	
+	http.HandleFunc("/store/", itemPage)
+
 	http.ListenAndServe(":8080", nil)
 }
