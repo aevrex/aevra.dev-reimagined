@@ -223,6 +223,20 @@ func store(w http.ResponseWriter, r *http.Request) {
 	render(w, "layout.html", PageData{Content: "store.html", Items: items})
 }
 
+func contact(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/contact" {
+		http.NotFound(w, r)
+		return
+	}
+
+	if isHTMX(r) {
+		render(w, "contact.html", PageData{})
+		return
+	}
+
+	render(w, "layout.html", PageData{Content: "contact.html"})
+}
+
 func itemPage(w http.ResponseWriter, r *http.Request) {
 	if !strings.HasPrefix(r.URL.Path, "/store/") {
 		http.NotFound(w, r)
@@ -256,6 +270,7 @@ func main() {
 	http.HandleFunc("/blog/", postPage)
 	http.HandleFunc("/store", store)
 	http.HandleFunc("/store/", itemPage)
+	http.HandleFunc("/contact", contact)
 
 	http.ListenAndServe(":8080", nil)
 }
